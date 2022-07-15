@@ -11,29 +11,31 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
 
+
 function App() {
   
   const [servicesItem, setServicesItem] = useState('');
-  const [brendsItem, setBrendsItem] = useState('');
+  const [brendsItem, setBrendItem] = useState('');
   const [styleItem, setStyleItem] = useState('');
   
   const [services, setServices] = useState(null);
   const [brends, setBrends] = useState(null);
   const [style, setStyle] = useState(null);
 
+ 
   const urlAddres = useLocation()
   const navigate = useNavigate()
 
   useEffect(() => {
-    axios.get('https://autobooking.com/api/test/v1/search/terms').then(response => {
+    axios.get('https://onboarding.art-code.team/api/test/v1/search/terms').then(response => {
     const services = response.data
     setServices(services.data)
   })
-    axios.get('https://autobooking.com/api/test/v1/search/brands_terms').then(response => {
+    axios.get('https://onboarding.art-code.team/api/test/v1/search/brands_terms').then(response => {
     const services = response.data
     setBrends(services.data)
   })
-    axios.get('https://autobooking.com/api/test/v1/search/styles').then(response => {
+    axios.get('https://onboarding.art-code.team/api/test/v1/search/styles').then(response => {
     const services = response.data
     setStyle(services.data)
   })
@@ -47,12 +49,18 @@ function App() {
   },[servicesItem, brendsItem, styleItem, navigate]);
 
   useEffect(() => {
-    const str1 = urlAddres.pathname.match('(\/s-).*?\/')[0].slice(3,-1)
-    const str2 = urlAddres.pathname.match('(\/b-).*?\/')[0].slice(3,-1)
-    const str3 = urlAddres.pathname.match('(\/st-).*?\/')[0].slice(4,-1)
+    const paramS = urlAddres.pathname.match('(\/s-).*?\/')[0].slice(3,-1)
+    const paramB = urlAddres.pathname.match('(\/b-).*?\/')[0].slice(3,-1)
+    const paramSt = urlAddres.pathname.match('(\/st-).*?\/')[0].slice(4,-1)
     axios
-      .get(`https://autobooking.com/api/test/v1/search/parse_link?service_slug=${str1}&brand_slug=${str2}&style_slug=${str3}`)
-      .then(response => {})
+      .get(`https://onboarding.art-code.team/api/test/v1/search/parse_link?brand_slug=${paramB}&service_slug=${paramS}&style_slug=${paramSt}`)
+      .then(response => {
+        const {brand , service, style} = response.data
+        console.log('resp' , response.data)
+        setServicesItem(service)
+        setBrendItem(brand)
+        setStyleItem(style)
+      })
 },[]);
 
  
@@ -77,7 +85,7 @@ function App() {
         name='Бренди' 
         value={brendsItem.label} 
         items={brends} 
-        setItem={  setBrendsItem } /> 
+        setItem={  setBrendItem } /> 
       <ListItem 
         name='Стилі' 
         value={styleItem.label} 
@@ -92,11 +100,9 @@ function App() {
 const ListItem = ({ items, value , setItem, name}) => {
   const [open, setOpen] = useState(false);
   
-
   if (!items) {
     return null
   }
-
   const handleOpen = () => {
     setOpen(!open);
   };
@@ -108,18 +114,18 @@ const ListItem = ({ items, value , setItem, name}) => {
 
   return (
      <>
-      <ListSubheader onClick={handleOpen} component="div" id="nested-list-subheader">
+      <ListSubheader  onClick={handleOpen} component="div" id="nested-list-subheader">
         { name }
-        {open ? <ExpandLess className='arov'  onClick={handleOpen}/> : <ExpandMore className='arov' onClick={handleOpen}/>}
+        {open ? <ExpandLess  /> : <ExpandMore onClick={handleOpen}/>}
       </ListSubheader>
 
-    <ListItemButton  >
+    <ListItemButton onClick={handleOpen} >
       <ListItemIcon>
       </ListItemIcon>
       <ListItemText primary={value} />
     </ListItemButton>
     <Collapse in={open} timeout="auto" unmountOnExit>
-      <List component="div" disablePadding>
+      <List  component="div" disablePadding>
         {items.map(s => {
           return (
             <ListItemButton onClick={() => handleClick(s)} key={s.id} sx={{ pl: 4 }}>
